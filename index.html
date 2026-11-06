@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyAI - Tu Plataforma de Estudio Inteligente</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
+</head>
+<body class="h-full font-sans antialiased bg-slate-950 text-slate-100 flex overflow-hidden">
+
+    <!-- LEFT SIDEBAR -->
+    <aside id="sidebar" class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0 transition-all duration-300 z-30">
+        <div>
+            <!-- App Logo & Title -->
+            <div class="p-5 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                        <i class="fa-solid fa-brain text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-white leading-tight">Study<span class="text-indigo-400">AI</span></h1>
+                        <span class="text-xs text-slate-400">Asistente de Exámenes</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5">
+                <p class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Diagnóstico & Perfil</p>
+                
+                <button onclick="switchView('diagnostic')" id="nav-diagnostic" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+                    <i class="fa-solid fa-clipboard-user w-5 text-center text-base text-indigo-400"></i>
+                    <span class="flex-1 text-left">Diagnóstico e Ingreso</span>
+                    <span id="diagnostic-badge" class="bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-0.5 rounded-full border border-indigo-500/30">Inicio</span>
+                </button>
+
+                <p class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 mt-5 mb-2">Estudio & Material</p>
+
+                <button onclick="switchView('upload')" id="nav-upload" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-file-arrow-up w-5 text-center text-base"></i>
+                    <span>Cargar Apuntes / PDF</span>
+                </button>
+
+                <button onclick="switchView('quiz')" id="nav-quiz" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-list-check w-5 text-center text-base text-emerald-400"></i>
+                    <span class="flex-1 text-left">Examen Múltiple</span>
+                    <span id="quiz-badge" class="bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30 hidden">Listo</span>
+                </button>
+
+                <button onclick="switchView('flashcards')" id="nav-flashcards" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-layer-group w-5 text-center text-base text-amber-400"></i>
+                    <span>Resumen & Tarjetas</span>
+                </button>
+
+                <p class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 mt-5 mb-2">Planificación</p>
+
+                <button onclick="switchView('calendar')" id="nav-calendar" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-calendar-days w-5 text-center text-base text-indigo-400"></i>
+                    <span>Calendario & Horarios</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer & API Key Trigger -->
+        <div class="p-4 border-t border-slate-800 space-y-3">
+            <!-- Racha de Estudio -->
+            <div class="bg-slate-800/60 rounded-xl p-3 flex items-center justify-between border border-slate-700/50">
+                <div class="flex items-center space-x-2.5">
+                    <div class="p-2 bg-orange-500/10 text-orange-400 rounded-lg">
+                        <i class="fa-solid fa-fire text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400">Racha actual</div>
+                        <div class="text-sm font-bold text-white">4 Días Seguidos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Key Status Button -->
+            
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-950">
+        
+        <!-- Top App Header -->
+        <header class="h-16 border-b border-slate-800 px-6 flex items-center justify-between shrink-0 bg-slate-900/50 backdrop-blur-md">
+            <div class="flex items-center space-x-3">
+                <h2 id="view-title" class="text-lg font-bold text-white">Cuestionario Diagnóstico y Personalización</h2>
+                <span id="view-subtitle" class="text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-md">Ingreso al Secundario</span>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <span id="active-profile-pill" class="text-xs px-3 py-1 bg-indigo-500/10 text-indigo-300 rounded-full border border-indigo-500/30 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap"></i> Perfil: General
+                </span>
+                <button onclick="toggleModal('studyGoalModal')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <span>Ajustar Meta</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- VIEW 0: DIAGNOSTIC QUESTIONNAIRE -->
+        <section id="view-diagnostic" class="content-view flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            <div class="max-w-3xl mx-auto space-y-6">
+                
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-indigo-900/50 via-purple-900/30 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 relative overflow-hidden shadow-xl">
+                    <div class="relative z-10">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30">Motor de Personalización StudyAI</span>
+                        <h2 class="text-2xl font-extrabold text-white mt-2">Diagnóstico de Ingreso al Secundario</h2>
+                        <p class="text-slate-300 text-sm mt-1">Este cuestionario calibra el nivel de vocabulario, la dificultad de los ejercicios, las tarjetas de memoria y los ritmos de estudio en tu calendario.</p>
+                    </div>
+                </div>
+
+                <!-- Step Tracker Progress Bar -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span id="diag-step-tag" class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Paso 1 de 5</span>
+                        <span id="diag-section-title" class="text-sm font-semibold text-white">— Sección 1: Perfil y Niveles</span>
+                    </div>
+                    <div class="w-36 bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="diag-progress-bar" class="bg-indigo-500 h-full w-1/5 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- DIAGNOSTIC QUESTION CARD CONTAINER -->
+                <div id="diag-card-container" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                    <!-- Dynamic Step Contents Rendered via JS -->
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="prevDiagStep()" id="btn-diag-prev" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition disabled:opacity-30" disabled>
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                    </button>
+                    <button onclick="nextDiagStep()" id="btn-diag-next" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+                        <span>Siguiente</span> <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- DIAGNOSTIC SUMMARY RESULT (Hidden by default) -->
+                <div id="diag-summary-card" class="hidden bg-slate-900 border border-emerald-500/30 rounded-2xl p-8 space-y-6 text-center shadow-2xl">
+                    <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-2xl border border-emerald-500/30">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">¡Perfil Configurado con Éxito!</h3>
+                        <p class="text-slate-300 text-sm mt-1">StudyAI ha calibrado tu plan de estudio y banco de exámenes según tus respuestas.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left pt-2">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 block">Nivel Asignado</span>
+                            <span id="res-academic-level" class="text-sm font-bold text-indigo-400">Ingreso Secundario</span>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 block">Materia Prioritaria</span>
+                            <span id="res-focus-subject" class="text-sm font-bold text-amber-400">Matemáticas</span>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 block">Estilo Recomendado</span>
+                            <span id="res-learning-style" class="text-sm font-bold text-emerald-400">Tests + Flashcards</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-3 pt-4">
+                        <button onclick="loadPresetBank('secundario')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i> Probar Examen Recomendado
+                        </button>
+                        <button onclick="switchView('upload')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-sm rounded-xl transition">
+                            Cargar mis propios apuntes
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW 1: MATERIAL INPUT (TEXT / PDF / OCR) -->
+        <section id="view-upload" class="content-view hidden flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-indigo-900/40 via-purple-900/20 to-slate-900 border border-indigo-500/20 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">Cargar Contenido</span>
+                        <h2 class="text-2xl font-bold text-white mt-2">¿Qué vas a rendir hoy?</h2>
+                        <p class="text-slate-300 text-sm mt-1">Carga fotos de apuntes manuscritos, resúmenes en texto o archivos PDF. También puedes seleccionar bancos de preguntas preconfigurados.</p>
+                    </div>
+                </div>
+
+                <!-- PRESET QUESTION BANKS QUICK-LAUNCH -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">O elige un Banco de Preguntas Demo por Nivel:</span>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button onclick="loadPresetBank('primario')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500 rounded-xl text-left transition flex items-center space-x-3">
+                            <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa-solid fa-child text-lg"></i></div>
+                            <div>
+                                <div class="text-xs font-bold text-white">Nivel Primario</div>
+                                <div class="text-[10px] text-slate-400">Ciencias, Lengua, Mates</div>
+                            </div>
+                        </button>
+
+                        <button onclick="loadPresetBank('secundario')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500 rounded-xl text-left transition flex items-center space-x-3">
+                            <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg"><i class="fa-solid fa-graduation-cap text-lg"></i></div>
+                            <div>
+                                <div class="text-xs font-bold text-white">Ingreso / Secundario</div>
+                                <div class="text-[10px] text-slate-400">Biología, Física, Historia</div>
+                            </div>
+                        </button>
+
+                        <button onclick="loadPresetBank('terciario')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500 rounded-xl text-left transition flex items-center space-x-3">
+                            <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg"><i class="fa-solid fa-university text-lg"></i></div>
+                            <div>
+                                <div class="text-xs font-bold text-white">Terciario / Univ.</div>
+                                <div class="text-[10px] text-slate-400">Epistemología, IA, Economía</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Type Tabs -->
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-5">
+                    <div class="flex border-b border-slate-800 space-x-4">
+                        <button onclick="switchInputTab('text')" id="tab-btn-text" class="input-tab-btn pb-3 px-1 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2">
+                            <i class="fa-solid fa-align-left"></i> Texto / Apuntes
+                        </button>
+                        <button onclick="switchInputTab('pdf')" id="tab-btn-pdf" class="input-tab-btn pb-3 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-red-400"></i> Archivo PDF
+                        </button>
+                        <button onclick="switchInputTab('ocr')" id="tab-btn-ocr" class="input-tab-btn pb-3 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-camera text-amber-400"></i> Foto / OCR Apunte
+                        </button>
+                    </div>
+
+                    <!-- TAB CONTENTS -->
+                    <!-- 1. Text Tab -->
+                    <div id="input-tab-text" class="space-y-4">
+                        <label class="block text-xs font-medium text-slate-400">Pega aquí el contenido del tema a estudiar:</label>
+                        <textarea id="study-text-input" rows="8" placeholder="Ejemplo: La fotosíntesis es el proceso metabólico por el cual las plantas convierten la luz solar en energía química. Consta de dos fases principales: la fase luminosa y la fase oscura (Ciclo de Calvin)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar"></textarea>
+                    </div>
+
+                    <!-- 2. PDF Tab -->
+                    <div id="input-tab-pdf" class="hidden space-y-4">
+                        <div class="border-2 border-dashed border-slate-800 hover:border-indigo-500/50 rounded-2xl p-8 text-center bg-slate-950/50 transition cursor-pointer flex flex-col items-center justify-center space-y-3" onclick="document.getElementById('pdf-file-input').click()">
+                            <div class="w-12 h-12 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-200">Haz clic o arrastra un archivo PDF aquí</p>
+                                <p class="text-xs text-slate-500 mt-1">Libros, diapositivas o guías de estudio (hasta 25MB)</p>
+                            </div>
+                            <input type="file" id="pdf-file-input" accept=".pdf" class="hidden" onchange="handleFileSelect(event, 'pdf')">
+                        </div>
+                        <div id="pdf-preview-info" class="hidden bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
+                            <div class="flex items-center space-x-3 text-sm text-slate-200">
+                                <i class="fa-solid fa-file-circle-check text-emerald-400 text-lg"></i>
+                                <span id="pdf-file-name" class="font-medium">documento.pdf</span>
+                            </div>
+                            <button onclick="removeSelectedFile('pdf')" class="text-xs text-slate-400 hover:text-red-400"><i class="fa-solid fa-xmark text-base"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- 3. OCR Image Tab -->
+                    <div id="input-tab-ocr" class="hidden space-y-4">
+                        <div class="border-2 border-dashed border-slate-800 hover:border-indigo-500/50 rounded-2xl p-8 text-center bg-slate-950/50 transition cursor-pointer flex flex-col items-center justify-center space-y-3" onclick="document.getElementById('image-file-input').click()">
+                            <div class="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-200">Sube una fotografía de tu apunte manuscrito</p>
+                                <p class="text-xs text-slate-500 mt-1">Soporta lecturas JPG, PNG (Escaner OCR con IA)</p>
+                            </div>
+                            <input type="file" id="image-file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event, 'image')">
+                        </div>
+                        <div id="image-preview-info" class="hidden space-y-2">
+                            <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
+                                <div class="flex items-center space-x-3 text-sm text-slate-200">
+                                    <i class="fa-solid fa-image text-amber-400 text-lg"></i>
+                                    <span id="image-file-name" class="font-medium">foto_apunte.jpg</span>
+                                </div>
+                                <button onclick="removeSelectedFile('image')" class="text-xs text-slate-400 hover:text-red-400"><i class="fa-solid fa-xmark text-base"></i></button>
+                            </div>
+                            <img id="image-preview-element" class="max-h-48 rounded-xl border border-slate-800 mx-auto object-contain" src="" alt="Vista previa">
+                        </div>
+                    </div>
+
+                    <!-- Cuestionario Settings -->
+                    <div class="pt-4 border-t border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Cantidad de Preguntas</label>
+                            <select id="quiz-num-questions" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="5">5 Preguntas (Rápido)</option>
+                                <option value="8" selected>8 Preguntas (Recomendado)</option>
+                                <option value="12">12 Preguntas (Examen Completo)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Nivel de Dificultad</label>
+                            <select id="quiz-difficulty" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="Facil">Fácil (Conceptos Directos)</option>
+                                <option value="Medio" selected>Medio (Análisis y Aplicación)</option>
+                                <option value="Avanzado">Avanzado (Examen Universitario)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Process CTA Button -->
+                    <button onclick="generateExamFromInput()" id="btn-generate-all" class="w-full py-3.5 px-6 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                        <span>Generar Examen e IA Resumen</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: INTERACTIVE MULTIPLE CHOICE QUIZ -->
+        <section id="view-quiz" class="content-view hidden flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <div class="max-w-3xl mx-auto space-y-6">
+                
+                <!-- Quiz Header Progress Card -->
+                <div id="quiz-progress-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-indigo-400 font-semibold uppercase tracking-wider">Examen en Curso</span>
+                        <h3 id="quiz-topic-title" class="text-lg font-bold text-white">Evaluación de Contenido</h3>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <span id="quiz-step-counter" class="text-sm font-bold text-white">Pregunta 1/8</span>
+                            <div class="w-32 bg-slate-800 h-2 rounded-full overflow-hidden mt-1">
+                                <div id="quiz-progress-bar" class="bg-indigo-500 h-full w-1/8 transition-all duration-300"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State if no quiz active -->
+                <div id="quiz-empty-state" class="text-center py-16 bg-slate-900/40 rounded-2xl border border-slate-800 p-8 space-y-4">
+                    <div class="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">No hay un examen activo</h3>
+                    <p class="text-sm text-slate-400 max-w-md mx-auto">Completa el cuestionario diagnóstico o carga tus apuntes para comenzar a practicar.</p>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="switchView('diagnostic')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-xl transition">
+                            Ir al Diagnóstico
+                        </button>
+                        <button onclick="loadPresetBank('secundario')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-sm rounded-xl transition">
+                            Cargar Banco Secundario
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Quiz Box -->
+                <div id="quiz-active-container" class="hidden space-y-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                        
+                        <!-- Question Text -->
+                        <div class="space-y-2">
+                            <span id="question-number-tag" class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Pregunta 1</span>
+                            <h2 id="question-text" class="text-xl font-bold text-white leading-snug">Cargando pregunta...</h2>
+                        </div>
+
+                        <!-- Options List -->
+                        <div id="options-container" class="space-y-3">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+
+                        <!-- Pedagogic Explanation Box (Revealed after answer) -->
+                        <div id="feedback-box" class="hidden p-4 rounded-xl border text-sm space-y-1 transition-all">
+                            <div id="feedback-status" class="font-bold flex items-center gap-2"></div>
+                            <p id="feedback-explanation" class="text-slate-300 leading-relaxed"></p>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Navigation Control -->
+                    <div class="flex justify-between items-center">
+                        <button onclick="prevQuestion()" id="btn-prev-q" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition disabled:opacity-40" disabled>
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                        </button>
+                        <button onclick="nextQuestion()" id="btn-next-q" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2">
+                            <span>Siguiente</span> <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Score Summary Screen -->
+                <div id="quiz-summary-container" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-6">
+                    <div class="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-3xl border border-emerald-500/20">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">¡Examen Completado!</h2>
+                        <p class="text-slate-400 text-sm mt-1">Has revisado tus conceptos clave con éxito.</p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 max-w-md mx-auto py-4">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400">Puntaje</div>
+                            <div id="score-percentage" class="text-2xl font-extrabold text-emerald-400">85%</div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400">Correctas</div>
+                            <div id="score-correct" class="text-2xl font-extrabold text-white">7/8</div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400">Repaso</div>
+                            <div id="score-study-time" class="text-2xl font-extrabold text-indigo-400">+15m</div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center gap-4">
+                        <button onclick="restartQuiz()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-xl transition">
+                            Reintentar Examen
+                        </button>
+                        <button onclick="switchView('calendar')" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition">
+                            Agendar Repaso en Calendario
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW 3: FLASHCARDS & SUMMARIES -->
+        <section id="view-flashcards" class="content-view hidden flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <!-- Summary Overview -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Resumen Simplificado (Analogía)
+                        </h3>
+                        <span class="text-xs bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-md border border-indigo-500/20">IA Generado</span>
+                    </div>
+                    <p id="summary-content" class="text-slate-300 text-sm leading-relaxed">
+                        Carga material o realiza el diagnóstico para ver una explicación sencilla adaptada a tu perfil.
+                    </p>
+                </div>
+
+                <!-- Interactive Flashcards -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-white">Tarjetas de Memorización (Flashcards)</h3>
+                    <p class="text-xs text-slate-400">Haz clic en la tarjeta para voltearla y ver la respuesta.</p>
+                    
+                    <div id="flashcards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Card Example 1 -->
+                        <div class="h-48 perspective-1000 cursor-pointer" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                            <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-center text-center">
+                                <!-- Front -->
+                                <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden">
+                                    <span class="text-xs text-indigo-400 font-semibold uppercase">Ciencias Naturales</span>
+                                    <p class="text-base font-semibold text-white">¿Cuál es el proceso metabólico de las plantas para elaborar glucosa?</p>
+                                    <span class="text-xs text-slate-500">Toca para voltear ↺</span>
+                                </div>
+                                <!-- Back -->
+                                <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden rotate-y-180 bg-indigo-950/80 rounded-2xl border border-indigo-500/30">
+                                    <span class="text-xs text-indigo-300 font-semibold uppercase">Respuesta</span>
+                                    <p class="text-sm text-slate-200">Fotosíntesis: absorben agua, CO2 y luz solar para transformarlos en alimento y oxígeno.</p>
+                                    <span class="text-xs text-indigo-400">Entendido ✓</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Example 2 -->
+                        <div class="h-48 perspective-1000 cursor-pointer" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                            <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-center text-center">
+                                <!-- Front -->
+                                <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden">
+                                    <span class="text-xs text-amber-400 font-semibold uppercase">Física / Newton</span>
+                                    <p class="text-base font-semibold text-white">¿Qué dice la Segunda Ley de Newton ($F = m \cdot a$)?</p>
+                                    <span class="text-xs text-slate-500">Toca para voltear ↺</span>
+                                </div>
+                                <!-- Back -->
+                                <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden rotate-y-180 bg-amber-950/80 rounded-2xl border border-amber-500/30">
+                                    <span class="text-xs text-amber-300 font-semibold uppercase">Respuesta</span>
+                                    <p class="text-sm text-slate-200">La aceleración es directamente proporcional a la fuerza e inversamente proporcional a la masa.</p>
+                                    <span class="text-xs text-amber-400">Entendido ✓</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: CALENDAR & STUDY SCHEDULE PLANNER -->
+        <section id="view-calendar" class="content-view hidden flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <div class="max-w-5xl mx-auto space-y-6">
+                <!-- Schedule Controls Banner -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Plan de Estudio Semanal Personalizado</h3>
+                        <p class="text-xs text-slate-400">Autogenerado según tu cuestionario diagnóstico y fecha de examen.</p>
+                    </div>
+                    <button onclick="addScheduleBlock()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Añadir Bloque
+                    </button>
+                </div>
+
+                <!-- Calendar Schedule Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
+                    <!-- Day Columns (Lunes a Domingo) -->
+                    <script>
+                        const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+                        days.forEach((day, idx) => {
+                            document.write(`
+                                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 min-h-[220px] flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                                            <span class="text-xs font-bold text-slate-300">${day}</span>
+                                            <span class="text-[10px] text-slate-500">${15 + idx} Sep</span>
+                                        </div>
+                                        <div id="day-events-${idx}" class="space-y-2">
+                                            ${idx === 0 || idx === 2 || idx === 4 ? `
+                                                <div class="p-2 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-xs space-y-1">
+                                                    <div class="font-semibold text-indigo-300">Repaso Mates / Fracciones</div>
+                                                    <div class="text-[10px] text-slate-400"><i class="fa-regular fa-clock"></i> 18:00 - 19:00</div>
+                                                </div>
+                                            ` : ''}
+                                            ${idx === 4 ? `
+                                                <div class="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs space-y-1">
+                                                    <div class="font-semibold text-emerald-300">Examen Simulacro</div>
+                                                    <div class="text-[10px] text-slate-400"><i class="fa-regular fa-clock"></i> 20:00 - 21:00</div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                    <button onclick="quickAddEvent(${idx})" class="w-full text-center py-1 bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-400 rounded-lg transition mt-2">+ Turno</button>
+                                </div>
+                            `);
+                        });
+                    </script>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALS -->
+    <!-- 1. API Key Modal -->
+    <div id="apiModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-key text-indigo-400"></i> Clave API Gemini
+                </h3>
+                <button onclick="toggleModal('apiModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-400">Ingresa tu API Key de Google Gemini para usar IA en vivo. De lo contrario, la plataforma usará el banco integrado offline de preguntas pedagógicas.</p>
+            <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Gemini API Key</label>
+                <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button onclick="saveApiKey()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-xl transition">Guardar Configuración</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Study Goal Modal -->
+    <div id="studyGoalModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye text-indigo-400"></i> Meta de Horas Diarias
+                </h3>
+                <button onclick="toggleModal('studyGoalModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-400">Define cuántas horas deseas estudiar por día antes del examen:</p>
+            <div>
+                <input type="number" id="daily-hours-input" value="1.5" min="0.5" max="10" step="0.5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+            </div>
+            <button onclick="toggleModal('studyGoalModal')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-xl transition">Ajustar Objetivo</button>
+        </div>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <script>
+        // State Management
+        let appState = {
+            apiKey: '',
+            selectedInputTab: 'text',
+            currentQuiz: null,
+            currentQuestionIdx: 0,
+            userAnswers: [],
+            selectedFile: null,
+            selectedFileType: null,
+            diagStep: 0,
+            diagAnswers: {}
+        };
+
+        // Data Structure for Diagnostic Questionnaire
+        const diagnosticQuestions = [
+            {
+                step: 1,
+                sectionTitle: "Sección 1: Perfil y Diagnóstico de Nivel",
+                questions: [
+                    {
+                        id: 'stage',
+                        label: "¿En qué etapa académica te encuentras actualmente?",
+                        options: [
+                            { val: 'A', text: "Cursando el último año de Educación Primaria (6.º o 7.º grado)." },
+                            { val: 'B', text: "Recientemente egresado de Primaria, preparando el examen de ingreso." },
+                            { val: 'C', text: "Cursando el primer año del Nivel Secundario (1.er año / 1.er ciclo)." },
+                            { val: 'D', text: "Otro nivel." }
+                        ]
+                    },
+                    {
+                        id: 'orientation',
+                        label: "¿A qué tipo de colegio secundario aspiras ingresar o estás asistiendo?",
+                        options: [
+                            { val: 'A', text: "Orientación en Ciencias Naturales / Salud" },
+                            { val: 'B', text: "Orientación en Economía / Administración" },
+                            { val: 'C', text: "Colegio Técnico / Electromecánica / Informática" },
+                            { val: 'D', text: "Orientación en Humanidades / Arte / Ciencias Sociales" },
+                            { val: 'E', text: "Aún no lo he decidido" },
+                            { val: 'F', text: "Otra modalidad (especificar cuál)", hasInput: true }
+                        ]
+                    }
+                ]
+            },
+            {
+                step: 2,
+                sectionTitle: "Sección 2: Preferencias e Intereses Académicos",
+                questions: [
+                    {
+                        id: 'favorite_subject',
+                        label: "¿Cuál es tu materia favorita o la que más te gusta estudiar?",
+                        options: [
+                            { val: 'A', text: "Matemáticas (números, operaciones, problemas de lógica)" },
+                            { val: 'B', text: "Lengua / Literatura (lectura, ortografía, redacción)" },
+                            { val: 'C', text: "Ciencias Naturales (biología, cuerpo humano, animales)" },
+                            { val: 'D', text: "Ciencias Sociales (historia, geografía, formación ética)" },
+                            { val: 'E', text: "Inglés u otros idiomas" }
+                        ]
+                    },
+                    {
+                        id: 'hardest_subject',
+                        label: "¿Cuál es la materia que te resulta más difícil o necesitas más apoyo?",
+                        options: [
+                            { val: 'A', text: "Matemáticas y Resolución de Problemas" },
+                            { val: 'B', text: "Lengua, Comprensión Lectora y Gramática" },
+                            { val: 'C', text: "Ciencias Naturales" },
+                            { val: 'D', text: "Ciencias Sociales y Memorización de Fechas/Conceptos" }
+                        ]
+                    }
+                ]
+            },
+            {
+                step: 3,
+                sectionTitle: "Sección 3: Hábitos y Estilos de Aprendizaje",
+                questions: [
+                    {
+                        id: 'learning_style',
+                        label: "¿Cómo te resulta más fácil aprender un tema nuevo?",
+                        options: [
+                            { val: 'A', text: "Respondiendo cuestionarios e interactuando (Aprender con tests)" },
+                            { val: 'B', text: "Leyendo esquemas simples y resúmenes con analogías" },
+                            { val: 'C', text: "Memorizando tarjetas rápidas (Flashcards)" },
+                            { val: 'D', text: "Explicándole el tema a otra persona o en voz alta" }
+                        ]
+                    },
+                    {
+                        id: 'study_time',
+                        label: "¿Cuánto tiempo sueles estudiar por día cuando te preparas para una prueba?",
+                        options: [
+                            { val: 'A', text: "Menos de 30 minutos (sesiones breves)" },
+                            { val: 'B', text: "Entre 30 y 60 minutos" },
+                            { val: 'C', text: "Entre 1 y 2 horas con descansos" },
+                            { val: 'D', text: "Solo estudio el día anterior durante varias horas seguidas" }
+                        ]
+                    }
+                ]
+            },
+            {
+                step: 4,
+                sectionTitle: "Sección 4: Autoevaluación de Contenidos Clave",
+                questions: [
+                    {
+                        id: 'math_confidence',
+                        label: "¿Cómo te sientes al resolver ecuaciones o fracciones (ej. 2x + 4 = 10)?",
+                        options: [
+                            { val: 'A', text: "Muy confiado, los resuelvo rápido y sin ayuda" },
+                            { val: 'B', text: "Confiado, pero a veces me equivoco en las cuentas" },
+                            { val: 'C', text: "Me cuesta saber qué operación aplicar según el problema" },
+                            { val: 'D', text: "Necesito repasar desde los conceptos más básicos" }
+                        ]
+                    },
+                    {
+                        id: 'reading_confidence',
+                        label: "Al leer un texto largo para el colegio, ¿qué tan fácil encuentras la idea principal?",
+                        options: [
+                            { val: 'A', text: "Muy fácil, distingo de inmediato lo importante" },
+                            { val: 'B', text: "Puedo hacerlo si me concentro, pero me lleva tiempo" },
+                            { val: 'C', text: "Me cuesta resumir, suelo copiar casi todo de nuevo" },
+                            { val: 'D', text: "Me cuesta entender el significado general si hay palabras complejas" }
+                        ]
+                    }
+                ]
+            },
+            {
+                step: 5,
+                sectionTitle: "Sección 5: Planificación del Examen",
+                questions: [
+                    {
+                        id: 'exam_timeline',
+                        label: "¿Cuándo es tu próximo examen de ingreso o evaluación importante?",
+                        options: [
+                            { val: 'A', text: "En menos de 2 semanas (Modo Intensivo / Repaso Rápido)" },
+                            { val: 'B', text: "En 1 mes" },
+                            { val: 'C', text: "En 2 a 3 meses" },
+                            { val: 'D', text: "No tengo fecha fija, solo quiero reforzar conocimientos" }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // Preset Question Banks loaded from database
+        const presetBanks = {
+            primario: {
+                topic: "Diagnóstico Nivel Primario",
+                questions: [
+                    {
+                        question: "¿Cuál es el proceso mediante el cual las plantas fabrican su propio alimento utilizando la luz del sol?",
+                        options: ["Respiración", "Fotosíntesis", "Digestión", "Transpiración"],
+                        correctIndex: 1,
+                        explanation: "Las plantas absorben luz solar, agua y dióxido de carbono para transformarlos en glucosa y oxígeno a través de la fotosíntesis."
+                    },
+                    {
+                        question: "¿Cuál de las siguientes palabras es un sustantivo propio?",
+                        options: ["Perro", "Ciudad", "Argentina", "Cantar"],
+                        correctIndex: 2,
+                        explanation: "Los sustantivos propios nombran lugares, personas o animales en particular para distinguirlos de los demás, y siempre se escriben con mayúscula."
+                    },
+                    {
+                        question: "Si Juan tiene 3 cajas y en cada caja hay 6 lápices, ¿cuántos lápices tiene en total?",
+                        options: ["9 lápices", "12 lápices", "18 lápices", "24 lápices"],
+                        correctIndex: 2,
+                        explanation: "Para calcular el total sumamos 6 + 6 + 6 o multiplicamos la cantidad de cajas por lápices: 3 x 6 = 18."
+                    },
+                    {
+                        question: "¿Cuál es el océano más grande del planeta Tierra?",
+                        options: ["Océano Atlántico", "Océano Pacífico", "Océano Índico", "Océano Ártico"],
+                        correctIndex: 1,
+                        explanation: "El Océano Pacífico cubre más de un tercio de la superficie terrestre y es el más profundo del mundo."
+                    }
+                ]
+            },
+            secundario: {
+                topic: "Simulacro Ingreso a Secundario / Nivel Medio",
+                questions: [
+                    {
+                        question: "¿Qué organela celular es conocida como la 'central de energía' por llevar a cabo la respiración celular?",
+                        options: ["Ribosoma", "Mitocondria", "Aparato de Golgi", "Núcleo"],
+                        correctIndex: 1,
+                        explanation: "La mitocondria sintetiza ATP (energía) a partir de la glucosa y el oxígeno."
+                    },
+                    {
+                        question: "Según la Segunda Ley de Newton, ¿qué sucede con la aceleración si aumentamos la fuerza aplicada manteniendo la masa constante?",
+                        options: ["La aceleración disminuye a la mitad", "La aceleración permanece constante", "La aceleración aumenta de forma directamente proporcional", "La aceleración se vuelve cero"],
+                        correctIndex: 2,
+                        explanation: "La fórmula de Newton es F = m · a. Al aumentar la fuerza F con masa constante, la aceleración a aumenta proporcionalmente."
+                    },
+                    {
+                        question: "¿Qué acontecimiento ocurrido en 1789 marcó el inicio de la Edad Contemporánea y la caída del Absolutismo en Francia?",
+                        options: ["La Revolución Industrial", "La Revolución Francesa", "La Primera Guerra Mundial", "La Independencia de EE.UU."],
+                        correctIndex: 1,
+                        explanation: "La Revolución Francesa derrocó la monarquía absoluta e introdujo los conceptos de libertad, igualdad y fraternidad."
+                    },
+                    {
+                        question: "En la frase 'El manto blanco de la montaña nos deslumbró', ¿qué figura literaria se utiliza para la nieve?",
+                        options: ["Hipérbole", "Personificación", "Metáfora", "Onomatopeya"],
+                        correctIndex: 2,
+                        explanation: "La metáfora sustituye un término real ('nieve') por uno figurado ('manto blanco') basado en su semejanza."
+                    }
+                ]
+            },
+            terciario: {
+                topic: "Nivel Terciario / Universitario",
+                questions: [
+                    {
+                        question: "En un diseño experimental, ¿cómo se define a la variable que el investigador manipula directamente?",
+                        options: ["Variable Dependiente", "Variable Interviniente", "Variable Independiente", "Variable Confusora"],
+                        correctIndex: 2,
+                        explanation: "La variable independiente es la causa que el investigador modifica deliberadamente para medir sus efectos."
+                    },
+                    {
+                        question: "Según Thomas Kuhn, ¿cómo se denomina el conjunto de prácticas y supuestos compartidos por una comunidad científica?",
+                        options: ["Falsacionismo", "Paradigma", "Dogma", "Anarquismo epistemológico"],
+                        correctIndex: 1,
+                        explanation: "Un paradigma define los problemas y métodos legítimos de investigación hasta entrar en crisis."
+                    },
+                    {
+                        question: "¿Qué tipo de aprendizaje automático (Machine Learning) se utiliza cuando el algoritmo se entrena con datos y sus etiquetas correctas?",
+                        options: ["Aprendizaje No Supervisado", "Aprendizaje por Refuerzo", "Aprendizaje Supervisado", "Clustering"],
+                        correctIndex: 2,
+                        explanation: "En el aprendizaje supervisado el modelo aprende relacionando las entradas con sus etiquetas o respuestas esperadas."
+                    }
+                ]
+            }
+        };
+
+        // Switch Main Navigation View
+        function switchView(viewName) {
+            document.querySelectorAll('.content-view').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600/20', 'text-indigo-400', 'border', 'border-indigo-500/30');
+                btn.classList.add('text-slate-300');
+            });
+
+            const activeView = document.getElementById(`view-${viewName}`);
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeNav) {
+                activeNav.classList.add('bg-indigo-600/20', 'text-indigo-400', 'border', 'border-indigo-500/30');
+                activeNav.classList.remove('text-slate-300');
+            }
+
+            // Update Header Titles
+            const titles = {
+                diagnostic: ['Cuestionario Diagnóstico e Ingreso', 'Personalización de Estudio'],
+                upload: ['Cargar Apuntes & Material', 'PDF, Fotos u OCR'],
+                quiz: ['Examen de Opción Múltiple', 'Evaluación interactiva'],
+                flashcards: ['Resúmenes & Flashcards', 'Memorización eficiente'],
+                calendar: ['Calendario de Estudio', 'Planificación de horarios']
+            };
+            if(titles[viewName]) {
+                document.getElementById('view-title').innerText = titles[viewName][0];
+                document.getElementById('view-subtitle').innerText = titles[viewName][1];
+            }
+        }
+
+        // Render Diagnostic Step
+        function renderDiagStep() {
+            const stepObj = diagnosticQuestions[appState.diagStep];
+            if (!stepObj) return;
+
+            document.getElementById('diag-step-tag').innerText = `Paso ${stepObj.step} de 5`;
+            document.getElementById('diag-section-title').innerText = `— ${stepObj.sectionTitle}`;
+            document.getElementById('diag-progress-bar').style.width = `${(stepObj.step / 5) * 100}%`;
+
+            const container = document.getElementById('diag-card-container');
+            container.innerHTML = '';
+
+            stepObj.questions.forEach(q => {
+                const qBox = document.createElement('div');
+                qBox.className = "space-y-3 pb-4 border-b border-slate-800 last:border-0 last:pb-0";
+
+                let optionsHtml = q.options.map(opt => {
+                    const isSelected = appState.diagAnswers[q.id] === opt.val;
+                    let extraInputHtml = '';
+                    if (opt.hasInput && isSelected) {
+                        const customVal = appState.diagAnswers[q.id + '_custom'] || '';
+                        extraInputHtml = `
+                            <div class="mt-2.5 pt-2 border-t border-indigo-500/30" onclick="event.stopPropagation()">
+                                <input type="text" id="input-${q.id}-custom" placeholder="Especifica la modalidad u orientación..." 
+                                    value="${customVal}" 
+                                    oninput="updateCustomDiagAnswer('${q.id}', this.value)"
+                                    class="w-full bg-slate-900 border border-indigo-500/50 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-400">
+                            </div>
+                        `;
+                    }
+                    return `
+                        <button onclick="selectDiagAnswer('${q.id}', '${opt.val}')" class="w-full text-left p-3.5 rounded-xl border ${isSelected ? 'bg-indigo-600/20 border-indigo-500 text-white font-medium' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'} transition flex flex-col justify-center">
+                            <div class="flex items-center justify-between w-full">
+                                <span class="text-sm"><strong class="text-indigo-400 mr-2">${opt.val})</strong> ${opt.text}</span>
+                                ${isSelected ? '<i class="fa-solid fa-circle-check text-indigo-400 text-base"></i>' : ''}
+                            </div>
+                            ${extraInputHtml}
+                        </button>
+                    `;
+                }).join('');
+
+                qBox.innerHTML = `
+                    <label class="block text-sm font-bold text-white mb-2">${q.label}</label>
+                    <div class="space-y-2">${optionsHtml}</div>
+                `;
+                container.appendChild(qBox);
+            });
+
+            document.getElementById('btn-diag-prev').disabled = appState.diagStep === 0;
+            const nextBtn = document.getElementById('btn-diag-next');
+            if (appState.diagStep === diagnosticQuestions.length - 1) {
+                nextBtn.innerHTML = `<span>Finalizar Diagnóstico</span> <i class="fa-solid fa-check text-xs"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>Siguiente</span> <i class="fa-solid fa-chevron-right text-xs"></i>`;
+            }
+        }
+
+        function selectDiagAnswer(questionId, value) {
+            appState.diagAnswers[questionId] = value;
+            renderDiagStep();
+        }
+
+        function updateCustomDiagAnswer(questionId, value) {
+            appState.diagAnswers[questionId + '_custom'] = value;
+        }
+
+        function nextDiagStep() {
+            if (appState.diagStep < diagnosticQuestions.length - 1) {
+                appState.diagStep++;
+                renderDiagStep();
+            } else {
+                completeDiagnostic();
+            }
+        }
+
+        function prevDiagStep() {
+            if (appState.diagStep > 0) {
+                appState.diagStep--;
+                renderDiagStep();
+            }
+        }
+
+        function completeDiagnostic() {
+            document.getElementById('diag-card-container').classList.add('hidden');
+            document.getElementById('btn-diag-prev').classList.add('hidden');
+            document.getElementById('btn-diag-next').classList.add('hidden');
+            document.getElementById('diag-summary-card').classList.remove('hidden');
+
+            // Update Pill Tag
+            const stageText = appState.diagAnswers.stage === 'A' ? 'Ingreso Secundario' : 'Secundario General';
+            document.getElementById('active-profile-pill').innerHTML = `<i class="fa-solid fa-user-check text-emerald-400"></i> Perfil: ${stageText}`;
+            document.getElementById('res-academic-level').innerText = stageText;
+
+            const hardSubjectMap = {
+                'A': 'Matemáticas y Lógica',
+                'B': 'Lengua y Comprensión',
+                'C': 'Ciencias Naturales',
+                'D': 'Ciencias Sociales'
+            };
+            document.getElementById('res-focus-subject').innerText = hardSubjectMap[appState.diagAnswers.hardest_subject] || 'Matemáticas';
+            
+            document.getElementById('diagnostic-badge').innerText = "Completado";
+            document.getElementById('diagnostic-badge').className = "bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30";
+        }
+
+        // Load Preset Bank
+        function loadPresetBank(levelKey) {
+            const bank = presetBanks[levelKey];
+            if (!bank) return;
+
+            appState.currentQuiz = bank;
+            appState.currentQuestionIdx = 0;
+            appState.userAnswers = new Array(bank.questions.length).fill(null);
+
+            document.getElementById('quiz-badge').classList.remove('hidden');
+            renderQuizQuestion();
+            switchView('quiz');
+        }
+
+        // Switch Input Tab (Text vs PDF vs OCR)
+        function switchInputTab(tabType) {
+            appState.selectedInputTab = tabType;
+            document.querySelectorAll('.input-tab-btn').forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'text-indigo-400');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+            
+            document.getElementById(`tab-btn-${tabType}`).classList.add('border-indigo-500', 'text-indigo-400');
+            document.getElementById(`tab-btn-${tabType}`).classList.remove('border-transparent', 'text-slate-400');
+
+            ['text', 'pdf', 'ocr'].forEach(t => {
+                document.getElementById(`input-tab-${t}`).classList.add('hidden');
+            });
+            document.getElementById(`input-tab-${tabType}`).classList.remove('hidden');
+        }
+
+        // Handle File Drag / Select
+        function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            appState.selectedFile = file;
+            appState.selectedFileType = type;
+
+            if (type === 'pdf') {
+                document.getElementById('pdf-file-name').innerText = file.name;
+                document.getElementById('pdf-preview-info').classList.remove('hidden');
+            } else if (type === 'image') {
+                document.getElementById('image-file-name').innerText = file.name;
+                document.getElementById('image-preview-info').classList.remove('hidden');
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('image-preview-element').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeSelectedFile(type) {
+            appState.selectedFile = null;
+            appState.selectedFileType = null;
+            if (type === 'pdf') {
+                document.getElementById('pdf-preview-info').classList.add('hidden');
+                document.getElementById('pdf-file-input').value = '';
+            } else {
+                document.getElementById('image-preview-info').classList.add('hidden');
+                document.getElementById('image-file-input').value = '';
+            }
+        }
+
+        // Generate Exam Process
+        async function generateExamFromInput() {
+            const numQ = parseInt(document.getElementById('quiz-num-questions').value) || 5;
+            const diff = document.getElementById('quiz-difficulty').value;
+            let inputText = document.getElementById('study-text-input').value.trim();
+
+            if (appState.selectedInputTab === 'text' && !inputText) {
+                alertModal("Por favor pega algún texto de estudio antes de generar.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-generate-all');
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing con IA...`;
+
+            try {
+                let quizData;
+
+                // Check if user has Gemini Key
+                if (appState.apiKey) {
+                    quizData = await callGeminiAPI(inputText, numQ, diff);
+                } else {
+                    // Smart Offline Mock Generator
+                    await new Promise(r => setTimeout(r, 1000));
+                    quizData = generateSmartMockQuiz(inputText || "Apunte General de Estudio", numQ);
+                }
+
+                appState.currentQuiz = quizData;
+                appState.currentQuestionIdx = 0;
+                appState.userAnswers = new Array(quizData.questions.length).fill(null);
+
+                document.getElementById('quiz-badge').classList.remove('hidden');
+                renderQuizQuestion();
+                switchView('quiz');
+
+            } catch (err) {
+                alertModal("Ocurrió un error. Se usará el simulador estándar.");
+                quizData = generateSmartMockQuiz("Contenido de Estudio", numQ);
+                appState.currentQuiz = quizData;
+                renderQuizQuestion();
+                switchView('quiz');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        // Render Current Question
+        function renderQuizQuestion() {
+            const quiz = appState.currentQuiz;
+            if (!quiz || !quiz.questions.length) return;
+
+            document.getElementById('quiz-empty-state').classList.add('hidden');
+            document.getElementById('quiz-summary-container').classList.add('hidden');
+            document.getElementById('quiz-active-container').classList.remove('hidden');
+
+            const qIdx = appState.currentQuestionIdx;
+            const q = quiz.questions[qIdx];
+
+            document.getElementById('quiz-topic-title').innerText = quiz.topic || "Examen de Repaso";
+            document.getElementById('quiz-step-counter').innerText = `Pregunta ${qIdx + 1}/${quiz.questions.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((qIdx + 1) / quiz.questions.length) * 100}%`;
+            
+            document.getElementById('question-number-tag').innerText = `Pregunta ${qIdx + 1}`;
+            document.getElementById('question-text').innerText = q.question;
+
+            // Options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            const selectedAns = appState.userAnswers[qIdx];
+
+            q.options.forEach((opt, idx) => {
+                const isSelected = selectedAns === idx;
+                const isCorrect = q.correctIndex === idx;
+                
+                let btnStyle = "bg-slate-950 border-slate-800 text-slate-200 hover:border-slate-700";
+                
+                if (selectedAns !== null) {
+                    if (isCorrect) btnStyle = "bg-emerald-500/10 border-emerald-500 text-emerald-300 font-semibold";
+                    else if (isSelected && !isCorrect) btnStyle = "bg-rose-500/10 border-rose-500 text-rose-300";
+                }
+
+                const optBtn = document.createElement('button');
+                optBtn.className = `w-full text-left p-4 rounded-xl border ${btnStyle} transition flex items-center justify-between group`;
+                optBtn.onclick = () => selectAnswer(idx);
+                optBtn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-lg border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-400 group-hover:border-indigo-500">${String.fromCharCode(65 + idx)}</span>
+                        <span class="text-sm">${opt}</span>
+                    </div>
+                    ${selectedAns !== null && isCorrect ? '<i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>' : ''}
+                    ${selectedAns !== null && isSelected && !isCorrect ? '<i class="fa-solid fa-circle-xmark text-rose-400 text-base"></i>' : ''}
+                `;
+                container.appendChild(optBtn);
+            });
+
+            // Feedback Box
+            const feedbackBox = document.getElementById('feedback-box');
+            if (selectedAns !== null) {
+                feedbackBox.classList.remove('hidden');
+                const isCorrect = selectedAns === q.correctIndex;
+                const status = document.getElementById('feedback-status');
+                
+                if (isCorrect) {
+                    feedbackBox.className = "p-4 rounded-xl border text-sm space-y-1 bg-emerald-500/10 border-emerald-500/30 text-emerald-300";
+                    status.innerHTML = `<i class="fa-solid fa-circle-check"></i> ¡Respuesta Correcta!`;
+                } else {
+                    feedbackBox.className = "p-4 rounded-xl border text-sm space-y-1 bg-rose-500/10 border-rose-500/30 text-rose-300";
+                    status.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Respuesta Incorrecta`;
+                }
+                
+                document.getElementById('feedback-explanation').innerText = q.explanation;
+            } else {
+                feedbackBox.classList.add('hidden');
+            }
+
+            // Prev / Next Controls
+            document.getElementById('btn-prev-q').disabled = qIdx === 0;
+            const nextBtn = document.getElementById('btn-next-q');
+            if (qIdx === quiz.questions.length - 1) {
+                nextBtn.innerHTML = `<span>Finalizar Examen</span> <i class="fa-solid fa-trophy text-xs"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>Siguiente</span> <i class="fa-solid fa-chevron-right text-xs"></i>`;
+            }
+        }
+
+        function selectAnswer(optIdx) {
+            if (appState.userAnswers[appState.currentQuestionIdx] !== null) return;
+            appState.userAnswers[appState.currentQuestionIdx] = optIdx;
+            renderQuizQuestion();
+        }
+
+        function nextQuestion() {
+            if (appState.currentQuestionIdx < appState.currentQuiz.questions.length - 1) {
+                appState.currentQuestionIdx++;
+                renderQuizQuestion();
+            } else {
+                showQuizSummary();
+            }
+        }
+
+        function prevQuestion() {
+            if (appState.currentQuestionIdx > 0) {
+                appState.currentQuestionIdx--;
+                renderQuizQuestion();
+            }
+        }
+
+        function showQuizSummary() {
+            document.getElementById('quiz-active-container').classList.add('hidden');
+            document.getElementById('quiz-summary-container').classList.remove('hidden');
+
+            const quiz = appState.currentQuiz;
+            let correctCount = 0;
+            appState.userAnswers.forEach((ans, i) => {
+                if (ans === quiz.questions[i].correctIndex) correctCount++;
+            });
+
+            const percentage = Math.round((correctCount / quiz.questions.length) * 100);
+            document.getElementById('score-percentage').innerText = `${percentage}%`;
+            document.getElementById('score-correct').innerText = `${correctCount}/${quiz.questions.length}`;
+        }
+
+        function restartQuiz() {
+            appState.currentQuestionIdx = 0;
+            appState.userAnswers = new Array(appState.currentQuiz.questions.length).fill(null);
+            renderQuizQuestion();
+        }
+
+        // Smart Offline Fallback
+        function generateSmartMockQuiz(topicText, count) {
+            const cleanTopic = topicText.slice(0, 30) || "Conceptos Generales";
+            return {
+                topic: cleanTopic,
+                questions: Array.from({ length: count }, (_, i) => ({
+                    question: `¿Cuál es el concepto clave referente a ${cleanTopic} (Pregunta ${i + 1})?`,
+                    options: [
+                        `Es el proceso principal que regula la estructura clave.`,
+                        `Corresponde a la fase secundaria del sistema.`,
+                        `Representa la métrica analizada en el diagnóstico previo.`,
+                        `Ninguna de las opciones anteriores es totalmente correcta.`
+                    ],
+                    correctIndex: 0,
+                    explanation: `Explicación pedagógica: La opción A define con exactitud el concepto clave correspondiente a ${cleanTopic}.`
+                }))
+            };
+        }
+
+        // ============================================================
+        // CONEXIÓN CON EL AGENTE DE MAKE
+        // ============================================================
+        const WEBHOOK_URL = 'https://hook.us2.make.com/qel7ef3yingaq3zbjdf4ehcrll2h07c4';
+
+        // Le avisa a la app que use siempre el agente (ya no hace falta clave de Gemini)
+        appState.apiKey = 'make';
+
+        async function callGeminiAPI(promptText, numQuestions, difficulty) {
+            // Busca el texto de una respuesta del diagnóstico
+            const respuesta = (id) => {
+                for (const seccion of diagnosticQuestions) {
+                    for (const q of seccion.questions) {
+                        if (q.id === id) {
+                            const opcion = q.options.find(o => o.val === appState.diagAnswers[id]);
+                            return opcion ? opcion.text : 'Sin dato';
+                        }
+                    }
+                }
+                return 'Sin dato';
+            };
+
+            const datos = new URLSearchParams({
+                texto: promptText,
+                cantidad: numQuestions,
+                dificultad: difficulty,
+                materia_dificil: respuesta('hardest_subject'),
+                estilo: respuesta('learning_style')
+            });
+
+            const response = await fetch(WEBHOOK_URL, { method: 'POST', body: datos });
+            if (!response.ok) throw new Error('Make respondió ' + response.status);
+
+            const texto = await response.text();
+            return JSON.parse(texto.replace(/```json|```/g, '').trim());
+        }
+
+        // Modals & Storage
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            appState.apiKey = key;
+            document.getElementById('apiStatusText').innerText = key ? "IA Gemini Conectada" : "IA Modo Automático";
+            toggleModal('apiModal');
+        }
+
+        function alertModal(msg) {
+            alert(msg);
+        }
+
+        function addScheduleBlock() {
+            const day0 = document.getElementById('day-events-0');
+            if (day0) {
+                const newEl = document.createElement('div');
+                newEl.className = "p-2 bg-purple-500/10 border border-purple-500/30 rounded-lg text-xs space-y-1";
+                newEl.innerHTML = `<div class="font-semibold text-purple-300">Repaso Nuevo</div><div class="text-[10px] text-slate-400"><i class="fa-regular fa-clock"></i> 16:00 - 17:00</div>`;
+                day0.appendChild(newEl);
+            }
+        }
+
+        function quickAddEvent(dayIdx) {
+            const container = document.getElementById(`day-events-${dayIdx}`);
+            if (container) {
+                const newEl = document.createElement('div');
+                newEl.className = "p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs space-y-1";
+                newEl.innerHTML = `<div class="font-semibold text-amber-300">Sesión de Estudio</div><div class="text-[10px] text-slate-400"><i class="fa-regular fa-clock"></i> 15:00 - 16:00</div>`;
+                container.appendChild(newEl);
+            }
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDiagStep();
+        });
+    </script>
+</body>
+</html>
